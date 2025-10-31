@@ -89,28 +89,116 @@ public class ServiceStation {
         availablePumps.release();
     }
     
-    public void runSimulation() {
+    public void runSimulation(int totalCars) {
         ExecutorService pumpPool = Executors.newFixedThreadPool(numPumps);
+
+        // Creating and starting Pump threads (Consumers)
         for (int i = 0; i < numPumps; i++) {
-            // TODO:IDK just add the pumps stuff or something....Look Ali i tried
+            Pump pump = new Pump("Pump-" + (i + 1), this);
+            pumpPool.submit(pump);
         }
+
+        // Creating and starting Car threads (Producers)
+        for (int i = 1; i <= totalCars; i++) 
+        {
+            Car car = new Car("Car-" + i, this);
+            car.start();
+            try 
+            {
+                Thread.sleep((int)(Math.random() * 1000));
+            } 
+            catch (InterruptedException e) 
+            {
+                Thread.currentThread().interrupt();
+            }
+        }
+
         try {
-            Thread.sleep(10000);
+            Thread.sleep(15000);
             pumpPool.shutdownNow();
             pumpPool.awaitTermination(1, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+
+        System.out.println("\nAll cars processed; simulation ends.");
     }
 
-    // This Main method is for demonstration/testing purposes
     public static void main(String[] args) {
-        // TODO: read
-        System.out.println("Remove this when you are done with everything Ali and and add your code");
+        java.util.Scanner scanner = new java.util.Scanner(System.in);
+        
+        System.out.print("Enter waiting area capacity (1-10): ");
+        int slotSize = scanner.nextInt();
+
+        System.out.print("Enter number of pumps: ");
+        int numPumps = scanner.nextInt();
+
+        System.out.print("Enter number of cars to simulate: ");
+        int totalCars = scanner.nextInt();
+
+        scanner.close();
+        ServiceStation station = new ServiceStation(slotSize, numPumps);
+        station.runSimulation(totalCars);
     }
 }
 
-// TODO: Add your Car and Pump Classes here
+class Car extends Thread {
+    private final ServiceStation station;
+
+    public Car(String name, ServiceStation station) 
+    {
+        super(name);
+        this.station = station;
+    }
+
+    @Override
+    public void run() 
+    {
+        try 
+        {
+            station.enterQueue(this);
+        } 
+        catch (InterruptedException e) 
+        {
+            Thread.currentThread().interrupt();
+        }
+    }
+}
+
+class Pump implements Runnable {
+    private final String name;
+    private final ServiceStation station;
+
+    public Pump(String name, ServiceStation station) 
+    {
+        this.name = name;
+        this.station = station;
+    }
+
+    @Override
+    public void run() 
+    {
+        Thread.currentThread().setName(name);
+        try 
+        {
+            while (true) 
+            {
+                Car car = station.takeCar();
+                station.startService();
+
+                System.out.println(name + " STARTS servicing " + car.getName());
+                Thread.sleep((int)(Math.random() * 2000 + 1000));
+                System.out.println(name + " FINISHES servicing " + car.getName());
+
+                station.finishService();
+            }
+        } 
+        catch (InterruptedException e) 
+        {
+            Thread.currentThread().interrupt();
+        }
+    }
+}
 
 class Semaphore {
     private int permits;
