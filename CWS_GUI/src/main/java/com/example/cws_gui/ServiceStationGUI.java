@@ -51,7 +51,7 @@ public class ServiceStationGUI extends Application {
 
         // Styled input groups
         VBox slotsGroup = createInputGroup("Waiting Slots", waitingAreaField = new TextField("5"));
-        VBox pumpsGroup = createInputGroup("Pumps", pumpCountField = new TextField("5"));
+        VBox pumpsGroup = createInputGroup("Pumps", pumpCountField = new TextField("3"));
         VBox carsGroup = createInputGroup("Cars", carCountField = new TextField("12"));
 
         Region spacer = new Region();
