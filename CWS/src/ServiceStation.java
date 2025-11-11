@@ -1,18 +1,9 @@
-import java.util.Queue;
-import java.util.Queue;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-/**
- * The ServiceStation class acts as the Bounded Buffer manager.
- * It initializes the shared queue, the mutex, and the three semaphores
- * (emptySlots, fullSlots, and availablePumps) to coordinate
- * Producers (Cars) and Consumers (Pumps).
- */
 public class ServiceStation {
     // Shared
     private final List<Car> carQueue;
@@ -41,7 +32,6 @@ public class ServiceStation {
         System.out.println("-----------------------------------\n");
     }
 
-    // --- Methods for Car (Producer) interaction ---
     public void enterQueue(Car car) throws InterruptedException {
         System.out.println(car.getName() + " ARRVES, checking queue space.");
         emptySlots.acquire();
@@ -55,30 +45,23 @@ public class ServiceStation {
         fullSlots.release();
     }
 
-    // --- Methods for Pump (Consumer) interaction ---
     public Car takeCar() throws InterruptedException {
         Car car = null;
 
-        // 1. Wait
         fullSlots.acquire();
 
-        // 2. Acquire Mutex
         carMutex.acquire();
 
-        // Remove Car from the Queue
         car = carQueue.remove(0);
         System.out.println(Thread.currentThread().getName() + " takes " + car.getName() + ". Queue size: " + carQueue.size());
 
-        // Release Mutex
         carMutex.release();
 
-        // Release emptySlots
         emptySlots.release();
 
         return car;
     }
 
-    // --- Methods for Pump (Consumer) Service flow ---
     public void startService() throws InterruptedException {
         availablePumps.acquire();
         System.out.println(Thread.currentThread().getName() + " ACQUIRES a service bay and STARTS service.");
