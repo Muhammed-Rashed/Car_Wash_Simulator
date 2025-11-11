@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class ServiceStationGUI extends Application {
+    // Used for GUI
     private HBox pumpBox;
     private FlowPane waitingCarsBox;
     private TextArea logArea;
@@ -27,14 +28,16 @@ public class ServiceStationGUI extends Application {
     private Label statusText, pumpsStatusLabel, queueStatusLabel, statsLabel;
     private ServiceStation station;
     private Map<Integer, VBox> pumpVisuals = new HashMap<>();
+    private Label servedLabel, waitingLabel, totalLabel;
+
+    // Used for backend
     private int configSlots = 5;
     private int configPumps = 3;
     private int configCars = 12;
-    private Label servedLabel, waitingLabel, totalLabel;
+
 
     @Override
     public void start(Stage stage) {
-        // Top Section - Header with gradient
         Label title = new Label("Service Station Simulator");
         title.setFont(Font.font("System", FontWeight.BOLD, 28));
         title.setTextFill(Color.WHITE);
@@ -48,7 +51,7 @@ public class ServiceStationGUI extends Application {
 
         // Styled input groups
         VBox slotsGroup = createInputGroup("Waiting Slots", waitingAreaField = new TextField("5"));
-        VBox pumpsGroup = createInputGroup("Pumps", pumpCountField = new TextField("3"));
+        VBox pumpsGroup = createInputGroup("Pumps", pumpCountField = new TextField("5"));
         VBox carsGroup = createInputGroup("Cars", carCountField = new TextField("12"));
 
         Region spacer = new Region();
@@ -166,7 +169,7 @@ public class ServiceStationGUI extends Application {
         centerScroll.setFitToWidth(true);
         centerScroll.setStyle("-fx-background: #f5f6fa; -fx-background-color: #f5f6fa;");
 
-        // Bottom Section - Enhanced Statistics
+        // Bottom Section
         HBox statsBox = createStatsBox();
 
         // Main Layout
